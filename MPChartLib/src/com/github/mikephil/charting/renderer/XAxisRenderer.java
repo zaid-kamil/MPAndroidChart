@@ -85,6 +85,8 @@ public class XAxisRenderer extends AxisRenderer {
         mAxisLabelPaint.setTextSize(mXAxis.getTextSize());
         mAxisLabelPaint.setColor(mXAxis.getTextColor());
 
+
+
         if (mXAxis.getPosition() == XAxisPosition.TOP) {
 
             drawLabels(c, mViewPortHandler.contentTop() - yoffset,
@@ -148,6 +150,7 @@ public class XAxisRenderer extends AxisRenderer {
     protected void drawLabels(Canvas c, float pos, PointF anchor) {
 
         final float labelRotationAngleDegrees = mXAxis.getLabelRotationAngle();
+        final float normalizedLineHeight = Utils.calcTextHeight(mAxisLabelPaint, "Q");
 
         // pre allocate to save performance (dont allocate in loop)
         float[] position = new float[] {
@@ -182,14 +185,14 @@ public class XAxisRenderer extends AxisRenderer {
                     }
                 }
 
-                drawLabel(c, label, i, position[0], pos, anchor, labelRotationAngleDegrees);
+                drawLabel(c, label, i, position[0], pos, anchor, labelRotationAngleDegrees, normalizedLineHeight);
             }
         }
     }
 
-    protected void drawLabel(Canvas c, String label, int xIndex, float x, float y, PointF anchor, float angleDegrees) {
+    protected void drawLabel(Canvas c, String label, int xIndex, float x, float y, PointF anchor, float angleDegrees, float normalizedLineHeight) {
         String formattedLabel = mXAxis.getValueFormatter().getXValue(label, xIndex, mViewPortHandler);
-        Utils.drawText(c, formattedLabel, x, y, mAxisLabelPaint, anchor, angleDegrees);
+        Utils.drawText(c, formattedLabel, x, y, mAxisLabelPaint, anchor, angleDegrees, normalizedLineHeight);
     }
 
     @Override

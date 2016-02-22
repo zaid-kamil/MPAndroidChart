@@ -523,11 +523,11 @@ public abstract class Utils {
     }
 
     private static Rect mDrawTextRectBuffer = new Rect();
-    private static Paint.FontMetrics mFontMetricsBuffer = new Paint.FontMetrics();
 
     public static void drawText(Canvas c, String text, float x, float y,
                                 Paint paint,
-                                PointF anchor, float angleDegrees, float normalizedLineHeight) {
+                                PointF anchor, float angleDegrees,
+                                float lineHeight) {
 
         float drawOffsetX = 0.f;
         float drawOffsetY = 0.f;
@@ -537,19 +537,16 @@ public abstract class Utils {
         // Android sometimes has pre-padding
         drawOffsetX -= mDrawTextRectBuffer.left;
 
+        // Android does not snap the bounds to line boundaries,
+        //  and draws from bottom to top.
+        // And we want to normalize it.
+        drawOffsetY += lineHeight;
 
         // To have a consistent point of reference, we always draw left-aligned
         Paint.Align originalTextAlign = paint.getTextAlign();
         paint.setTextAlign(Paint.Align.LEFT);
 
         if (angleDegrees != 0.f) {
-
-            float lineHeight = mDrawTextRectBuffer.height();
-
-            // Android does not snap the bounds to line boundaries,
-            //  and draws from bottom to top.
-            // And we want to normalize it.
-            drawOffsetY += lineHeight;
 
             // Move the text drawing rect in a way that it always rotates around its center
             drawOffsetX -= mDrawTextRectBuffer.width() * 0.5f;
@@ -579,15 +576,10 @@ public abstract class Utils {
         }
         else {
 
-            // Android does not snap the bounds to line boundaries,
-            //  and draws from bottom to top.
-            // And we want to normalize it.
-            drawOffsetY += normalizedLineHeight;
-
             if (anchor.x != 0.f || anchor.y != 0.f) {
 
                 drawOffsetX -= mDrawTextRectBuffer.width() * anchor.x;
-                drawOffsetY -= normalizedLineHeight * anchor.y;
+                drawOffsetY -= lineHeight * anchor.y;
             }
 
             drawOffsetX += x;
@@ -602,14 +594,13 @@ public abstract class Utils {
     public static void drawMultilineText(Canvas c, StaticLayout textLayout,
                                          float x, float y,
                                          TextPaint paint,
-                                         PointF anchor, float angleDegrees) {
+                                         PointF anchor, float angleDegrees,
+                                         float lineHeight) {
 
         float drawOffsetX = 0.f;
         float drawOffsetY = 0.f;
         float drawWidth;
         float drawHeight;
-
-        final float lineHeight = paint.getFontMetrics(mFontMetricsBuffer);
 
         drawWidth = textLayout.getWidth();
         drawHeight = textLayout.getLineCount() * lineHeight;
@@ -680,7 +671,8 @@ public abstract class Utils {
                                          float x, float y,
                                          TextPaint paint,
                                          FSize constrainedToSize,
-                                         PointF anchor, float angleDegrees) {
+                                         PointF anchor, float angleDegrees,
+                                         float lineHeight) {
 
         StaticLayout textLayout = new StaticLayout(
                 text, 0, text.length(),
@@ -689,7 +681,7 @@ public abstract class Utils {
                 Layout.Alignment.ALIGN_NORMAL, 1.f, 0.f, false);
 
 
-        drawMultilineText(c, textLayout, x, y, paint, anchor, angleDegrees);
+        drawMultilineText(c, textLayout, x, y, paint, anchor, angleDegrees, lineHeight);
     }
 
     public static FSize getSizeOfRotatedRectangleByDegrees(FSize rectangleSize, float degrees)

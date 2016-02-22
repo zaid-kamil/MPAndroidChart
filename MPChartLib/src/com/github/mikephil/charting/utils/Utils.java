@@ -524,6 +524,26 @@ public abstract class Utils {
 
     private static Rect mDrawTextRectBuffer = new Rect();
 
+    /**
+     * Notes: Android draw text a little differently - from the bottom.
+     * But the real problem we have is Android giving the wrong values for ascent/descent
+     *   and thus we get wrong line spacing / line height values.
+     * In practice, paint.getFontMetrics(...) returns the -ascent + descent
+     *   the text height should only take ascent
+     *   but the ascent is usually a few pixels larger.
+     * So we must establish a baseline using a common character like "A".
+     * This is a general Java problem:
+     *   http://stackoverflow.com/questions/6202225/java-fontmetrics-ascent-incorrect
+     *
+     * @param c
+     * @param text
+     * @param x
+     * @param y
+     * @param paint
+     * @param anchor
+     * @param angleDegrees
+     * @param lineHeight
+     */
     public static void drawText(Canvas c, String text, float x, float y,
                                 Paint paint,
                                 PointF anchor, float angleDegrees,
